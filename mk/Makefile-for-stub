@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-2.0
+# Copyright 2020-2022 Martin Åberg
+
+# This Makefile is used to build the bros stub library.
+
+HOST    = arm-all-bros-
+
+BUILD = build/$(MULTIDIR)
+DIST  = dist/$(MULTIDIR)
+CFLAGS += $(MULTIFLAGS)
+
+# GCC include order is
+#   quoted, -iquote, -I, -isystem, "standard system directories", -idirafter
+CFLAGS += -isystem dist/bros/include
+
+LIBNAME = bros
+
+LIBSRCS := $(shell find src -name "*.c")
+# OBJSRC  := $(shell find startup -name "*.c")
+
+name1 := $(dir $(lastword $(MAKEFILE_LIST)))
+include $(addprefix $(name1)/,linklib.mk)
+

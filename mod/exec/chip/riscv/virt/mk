@@ -1,0 +1,5 @@
+include arch/riscv/mk
+
+SRCS += chip/riscv/virt/intnum.c
+SRCS += chip/riscv/virt/ns16550a.c
+

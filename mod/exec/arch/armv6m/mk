@@ -1,0 +1,9 @@
+SRCS    += arch/armv6m/start.S
+SRCS    += arch/armv6m/kcstart.c
+SRCS    += arch/armv6m/kprint_cpu.c
+SRCS    += arch/armv6m/kprint_regs.c
+SRCS    += intlock-sp.c
+SRCS    += intserver-sp.c
+
+INCDIR  += arch/armv6m/include
+

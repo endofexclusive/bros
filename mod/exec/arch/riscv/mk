@@ -1,0 +1,15 @@
+SRCS    += arch/riscv/start.S
+SRCS    += arch/riscv/intlock.S
+SRCS    += arch/riscv/kcstart.c
+SRCS    += arch/riscv/kprint_cpu.c
+# SRCS    += arch/riscv/rawio.c
+SRCS    += arch/riscv/sbi.c
+SRCS    += arch/riscv/trapcode.c
+SRCS    += mp.c
+SRCS    += intlock-mp.c
+SRCS    += intserver-mp.c
+
+INCDIR  += arch/riscv/include
+
+# ASFLAGS  += -Wa,-mno-relax
+

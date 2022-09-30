@@ -1,3 +1,240 @@
 BROS recreational operating system
 ==================================
 
+BROS has a portable exec.library with SMP.
+
+What is BROS? BROS is an incomplete operating system designed
+for embedded systems. The OS currently consists of a kernel
+(exec.library), a few example device drivers and build
+infrastructure.
+
+What is exec.library? Exec is a small-footprint multitasking
+operating system kernel, originally designed by Carl Sassenrath
+around 1983-1985. The implementation in this repository is a new
+independent development inspired by the original API. The major
+new thing here is that it can run in symmetric multiprocessor
+(SMP) environments.
+
+Some key concepts:
+- Low memory footprint: tens of kilobytes of ROM and RAM
+- Multiprocessor multitasking
+- All tasks share the same address space
+- Asynchronous message passing in shared memory
+- Asynchronous device I/O. Synchronous I/O is a special case.
+- Highly portable
+- Most things are relocatable
+- System functions can be replaced at run-time
+
+These are the current architecture ports:
+
+ Architecture  SMP  Example
+----------------------------------------------------------
+ ARMv6-M       No   Any Cortex-M0..M4, nRF51822, nRF52833
+ ARMv8-A       Yes  BCM2837 (Raspberry Pi 3)
+ RISC-V        Yes  QEMU virt
+ SPARC         Yes  LEON3
+----------------------------------------------------------
+
+
+Status
+======
+
+This software was written as recreation and to learn more about
+operating systems. The repository is published with the hope
+that it can be interesting for others into operating system
+programming.
+
+There is no plan.
+
+
+Possible extensions
+===================
+
+Here are some ideas on what could be done to extend the system.
+It should be possible to implement these extensions as
+individual (loadable) libraries.
+
+* Namespaces and file I/O. Plan 9 namespaces is an interesting
+  starting point. Could be extended with a run-time ELF
+  loader/linker/relocator for running user programs.
+
+* TCP/IP stack
+
+* Embedded scripting language, something similar to Tcl or the
+  rc shell from Plan 9.
+
+* A system tracer/logger/visualizer running on a host computer.
+  Tracing could be inserted on the BROS side at run-time as all
+  library functions can be patched when the system is up.
+
+
+Quick start
+===========
+
+Here are the steps if you want to build and experiment with
+BROS. Note however that there are no useful target applications
+available.
+
+First build the tool chains:
+  cd tool/gcc
+  make -C ext extdep
+  ./build.sh --nopdf all aarch64 arm avr riscv sparc
+  cd ../..
+
+Now manually add the bin directories tool/gcc/opt/*/bin to PATH.
+
+The next step is to build the SDK, like this:
+  ./scripts/all-sdk.sh
+
+Then go into an example directory to build and run:
+  cd board/riscv-virt
+  make
+  ./run.sh
+
+You can visit other directories under board to build/run for
+other targets. Note that the board directories do not contain
+much of a demonstration. The program will run some internal
+tests and print a few diagnostics.
+
+Additional make targets in the board directories are 'make size'
+and 'make stacks' to see module sizes and stack usage per
+function known at compile time.
+
+When developing for the BROS you may need to re-run the
+all-sdk.sh script after changing public headers or API. There is
+no need to re-build the tool chains.
+
+
+API definitions
+===============
+
+BROS libraries are built as individual modules and each have an
+API description, consisting of function specifications and
+documentation. For an example, see the files
+mod/expansion/func.tcl or mod/exec/func.tcl. These description
+can be used to build documentation and programming language
+bindings. Currently, C89 bindings can be generated for the
+libraries (inline calls, linker library stubs, etc.).
+
+
+Navigating the sources
+======================
+
+Public headers for the exec are in mod/exec/pub/exec.
+API reference can be created with the command
+  ./scripts/genref.tcl text < mod/exec/func.tcl
+Implementation is in the .c files in the mod directories.
+
+The all-sdk.sh script will generate function prototypes, for
+example in: sdk/aarch64/dist/bros/include/exec/libcall.h. These
+headers are visible to the tool chain if building with the
+build.sh script.
+
+
+Differences compared to the original exec.library (Exec 33)
+===========================================================
+
+The following is mainly of interest for those familiar with
+programming exec.library version 33.
+
+
+There is no Disable() and Enable()
+----------------------------------
+
+The Exec 33 Disable() function means "disable local interrupts"
+which is of limited use to applications on SMP.
+
+The most related BROS concept is the IntLock which is as a
+spin-lock, allowing fine-grained resource control. IntLock is
+typically used when data needs to be accessed by both task and
+interrupt context. The system uses IntLock to protect message
+port invariants for example, as you can send messages from
+interrupt context.
+
+Exec 33 allowed a task to do Disable() followed by Wait().  In
+BROS, you are not allowed to Wait() while holding an IntLock.
+(However, you can Wait() while holding a Mutex.)
+
+
+There is no Forbid()/Permit()
+-----------------------------
+
+Forbid() means "prevent the current task from being switched
+out", which is of limited use on SMP.  The most similar concept
+is ObtainMutex()/ReleaseMutex(). Mutex is the primary way to
+protect system structure invariants.
+
+
+No library base registers
+-------------------------
+
+For reentrant code, you need to supply library functions with
+the library base pointer as first argument. For example:
+  lWait(MyExecBase, 0)
+That is, there is no special ABI for base pointers. However,
+self-standing programs which do not need to be reentrant at
+run-time could use the simpler Wait(0) where the library base is
+implicit and fetched from a global variable.
+
+
+Jump vector tables replaced with function pointer tables
+--------------------------------------------------------
+
+Exec 33 puts executable code containing jump instructions in a
+jump vector table before each library base, at negative offsets.
+BROS libraries instead prefix library bases (still at negative
+offsets) with a table of function pointers. This is more
+portable but comes with the cost of an additional pointer lookup
+when calling library functions.
+
+
+Library open count is managed by the system
+-------------------------------------------
+
+In Exec 33, each library is responsible for maintaining the
+library open count reference counter and decisions on when to
+allow Expunge().
+
+In BROS, the system will manage the open count for libraries and
+does library list arbitration as appropriate. In particular, the
+library vectors Init(), Open(), Close() and Expunge() are called
+by the system without any locks held, which should avoid tricky
+situations such as an Open() opening additional libraries. It is
+possible for a library/device implementation to override this
+mechanism if it for example wants to prevent expunges.
+
+
+A task can remove itself but no other tasks
+-------------------------------------------
+
+The BROS RemTask() only operates on the calling task and can not
+remove others.  There is an always-running, mostly waiting,
+system cleanup task which processes actions after task removal
+such as deallocating task/stack memory. It can also send
+messages to other tasks to announce task removal. These removal
+actions are located on a list in the task structure. The
+implemented actions are deallocating memory with FreeEntry() and
+sending messages with ReplyMsg().
+
+
+What BROS is not
+================
+
+BROS is not intended as a desktop operating system and does not
+aim at being compatible with existing API:s. POSIX compatibility
+is also not a goal.
+
+
+License
+=======
+
+GNU General Public License, version 2
+
+
+Resources
+=========
+
+Good introductions to the original exec.library:
+* "The kickstart guide to the Amiga", 1987
+* http://amigadev.elowar.com/read/ADCD_2.1/Libraries_Manual_guide/node0003.html
+

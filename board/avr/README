@@ -1,0 +1,21 @@
+There is no BROS port for AVR, but modules compile.
+
+This directory contains scripts for building the modules for
+AVR5 (for example Atmega2560). The purpose is to check that
+everything compiles cleanly on this target which has 16-bit
+integers. Note however that there is currently no BROS port for
+AVR so linking and running is not possible.
+
+Some things to work with when porting to AVR:
+- Code (flash) and data (RAM) are in different address spaces so
+  constant data (.rodata) has to be copied to RAM at init time.
+  This includes the romtags.
+- The runtime will depend on soft implementations of mul and div
+  which should be fetched from external library, such as libgcc.
+  GCC also inserts dependencies on __do_copy_data() from libgcc.
+- If library jump tables take to much of RAM, then we could
+  implement special versions of MakeLibrary and create libcall
+  stubs which call the internal (in image) versions directly.
+  That would sacrifice run-time patching with SetFunction()
+  aswell as dynamic loading.
+

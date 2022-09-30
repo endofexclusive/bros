@@ -1,0 +1,12 @@
+This directory contains external dependencies for the BROS GCC
+tool chain.
+
+Download, extract and patch dependencies:
+  make extdep
+
+Patch files are located in the *-replace directories and are
+copied on top of the extracted archives.
+
+If you want to remove the downloaded and patched sources, use
+  make distclean
+

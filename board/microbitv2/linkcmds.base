@@ -1,0 +1,54 @@
+SECTIONS
+{
+        .text : {
+                _rom_begin = .;
+                _text_begin = .;
+                *(.text*)
+                _text_end = .;
+        } > REGION_TEXT AT > REGION_TEXT_LOAD
+
+        .rodata : {
+                *(.rodata*)
+                _rom_end = .;
+        } > REGION_RODATA AT > REGION_RODATA_LOAD
+
+        .data : {
+                _data_begin = .;
+                *(.data*)
+                _data_end = .;
+        } > REGION_DATA AT > REGION_DATA_LOAD
+        _data_size              = _data_end - _data_begin;
+        _data_load_begin        = LOADADDR (.data);
+        _data_load_end          = _data_load_begin + _data_size;
+
+        .bss : {
+                _bss_begin = .;
+                *(.bss*)
+                *(COMMON)
+                _bss_end = .;
+        } > REGION_BSS AT > REGION_BSS
+        _bss_size = _bss_end - _bss_begin;
+
+        .stack : ALIGN(0x10) {
+                _stack_begin = .;
+                . += 1024;
+                . = ALIGN(0x10);
+                _stack_end = .;
+        } > REGION_STACK AT > REGION_STACK
+
+        /DISCARD/ : { *(.eh_frame*) }
+        /DISCARD/ : { *(.note*) }
+}
+
+exec__bss_begin       = _bss_begin;
+exec__bss_end         = _bss_end;
+exec__data_size       = _data_size;
+exec__data_begin      = _data_begin;
+exec__data_end        = _data_end;
+exec__data_load_begin = _data_load_begin;
+exec__stack_end       = _stack_end;
+exec__rom_begin       = _rom_begin;
+exec__rom_end         = _rom_end;
+exec__addmem_bottom   = _stack_end;
+exec__addmem_top      = ORIGIN(REGION_STACK) + LENGTH(REGION_STACK);
+

@@ -1,0 +1,6 @@
+include arch/sparc/mk
+
+SRCS += chip/leon3/chip.S
+SRCS += chip/leon3/intnum.c
+SRCS += chip/leon3/rawio.c
+

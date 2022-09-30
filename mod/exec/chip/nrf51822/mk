@@ -1,0 +1,11 @@
+include arch/armv6m/mk
+
+SRCS += chip/nrf51822/rawio.c
+SRCS += chip/nrf51822/chip.c
+
+INCDIR  += chip/nrf51822/include
+
+# ARMv6-M has 32 max external interrupts
+# nRF51 has 26 external interrupts
+ASFLAGS += -Wa,--defsym,num_extint=26
+

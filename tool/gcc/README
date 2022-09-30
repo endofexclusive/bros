@@ -1,0 +1,66 @@
+About
+=====
+
+This directory contains scripts for building BROS toolchains
+based on GNU Binutils and GCC.
+
+
+Requirements
+============
+
+The following software has to be preinstalled in the system:
+
+* curl
+* Bash
+* Texinfo
+* Tex Live (pdflatex)
+* GNU make
+* Compiler for build system
+* GCC build dependencies (see the GCC document _Installing GCC_)
+
+To Install prerequisites in BSD systems:
+  pkg install bash texinfo texlive-full gmake mpc
+  pkg install gmp
+
+
+Preparation
+===========
+
+Before building the tool chain for the first time, fetch and
+patch the tool sources with this command:
+
+  make -C ext extdep
+
+
+Build
+=====
+
+Use the following command to build BROS tools from source:
+
+  ./build.sh all aarch64 arm avr riscv sparc
+
+Optionally, --nopdf, can be given on the command line to prevent
+building documentation in PDF format, and thus eliminating the
+pdflatex dependency.
+
+The toolchains will be installed in the opt/bros-$arch-$ver
+directories of the repository top-level directory. The
+installataion directories can be soft-linked to any suitable
+location. In either case, the installation directory bin should
+be added to PATH.
+
+You can test the installation like this:
+  $ aarch64-all-bros-ld -v
+  GNU ld (bros-aarch64-0.2.11) 2.39
+
+A tar.gz archive is created for the installation and build log
+files are located in the log directory.
+
+
+Default multilib
+================
+
+* RISC-V: -march=rv32gc -mabi=ilp32d
+  g is (2022-09-30) IMAFD, Zicsr, Zifencei
+  In other words, -march=rv32imafd_zicsr_zifencei -mabi=ilp32d
+

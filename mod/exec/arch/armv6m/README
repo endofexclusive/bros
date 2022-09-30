@@ -1,0 +1,77 @@
+Architecture port for ARMv6-M, compatible with ARMv7-M
+######################################################
+
+This is a single-processor port.
+
+When running on ARMv6-M, no access to reserved registers will be
+performed.  Probing is preferrably done at run-time.  Supervisor
+call (SVC instruction) is required by the port. SVC is optional on
+Cortex-M1.
+
+
+SysTick
+=======
+
+SysTick is optional ARMv6-M and mandatory in ARMv7-M.
+
+
+Exception priority
+==================
+
+                Exception         Exception
+ Architecture   prio bits         levels
+---------------------------------------------
+ ARMv6-M        always 2 bits     always 4
+ ARMv7-M        at least 3 bits   at least 8
+---------------------------------------------
+
+
+In addition, there are some exceptions which have prios in
+another range:
+
+ Level  Name        Comment
+----------------------------------------
+ -3     Reset       permanently enabled
+ -2     NMI         permanently enabled
+ -1     HardFault   permanently enabled
+----------------------------------------
+
+* All exceptions except Reset, NMI and HardFault have configurable
+  priority.
+* All configurable priorities are 0 at reset.
+* SysTick is permanently enabled
+* MemManage, Busfault and UsageFault can be disabled, and escalates
+  to HardFault when disabled. This is the behavior at reset.
+
+ARMv7-M has the MemManage, Busfault and UsageFault exceptions. These
+are are disabled (SHCSR) on reset which means that they escalate
+to HardFault.
+
+ARMv6-M does not have MemManage, BusFault, UsageFault, DebugMonitor.
+You will get HardFault instead.
+
+We treat all faults as fatal and leave the configurable faults
+disabled (default). The lowest priority (highest number) is reserved
+by this implementation for the PendSV. This leaves 3 exception
+priority levels for interrupts on ARMv6-M and at least 7 on ARMv7-M.
+
+"SYSTICK" is typically used to signal tasks so it can have low
+priority.
+
+What it means at the moment is that you can use prio levels 0x00..0xFE
+for your interrupts. For the higher numerical values, make sure you
+have prio bits enough to not collide with the CFG_EXC_PENDSV_PRIO
+(which may effectively be 0xC0).
+
+In ARMv6-M, CCR_UNALIGNED_TRP is always 1 meaning that 16-bit
+and 32-bit data acceses must be naturally aligned. The bit is
+programmable at run-time in ARMv7-M. A compiler can generate
+unaligned memory accesses when compiling for ARMv7-M, for
+example GCC with -mcpu=cortex-m3.
+
+
+Limitations
+===========
+
+This architectural port has no FPU support
+

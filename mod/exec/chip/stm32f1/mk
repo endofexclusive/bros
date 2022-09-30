@@ -1,0 +1,5 @@
+include arch/armv6m/mk
+
+SRCS += chip/stm32f1/rawio.c
+SRCS += chip/stm32f1/chip.c
+

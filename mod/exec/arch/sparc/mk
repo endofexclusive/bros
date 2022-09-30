@@ -1,0 +1,11 @@
+SRCS    += arch/sparc/start.S
+SRCS    += arch/sparc/intlock.S
+SRCS    += arch/sparc/kcstart.c
+SRCS    += arch/sparc/kprint_cpu.c
+SRCS    += arch/sparc/trapcode.c
+SRCS    += mp.c
+SRCS    += intlock-mp.c
+SRCS    += intserver-mp.c
+
+INCDIR  += arch/sparc/include
+

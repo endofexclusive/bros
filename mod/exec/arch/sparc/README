@@ -1,0 +1,41 @@
+This port
+=========
+
+- Executes in supervisor and user
+- Supports nested interrupts
+
+The following is true whenever PSR.ET=1:
+  - IF PSR.S=0 THEN port_ThisTask() is valid.
+  - IF PSR.S=0 THEN sp is a task stack.
+  - IF PSR.S=1 THEN port_ThisTask() can not be used.
+  - IF PSR.S=1 THEN sp is a task stack or local CPU interrupt stack.
+
+Traps "managed by the system" are:
+  - Interrupts
+  - window_overflow, window_underflow
+  - Some software traps like interrupt disable/enable and flush
+    windows
+
+If a trap not managed by the system occurs when PSR.S=1 then,
+then the exec.library will stop.
+
+If a trap not managed by the system occurs when PSR.S=0 then,
+then the Task->TrapCode() will be run (as supervisor). This
+means that a process can have its own handler for bus error,
+division by zero, illegal instruction, etc. Handler environment
+is same as for interrupts.
+
+This SPARC architectural port is designed to allow tasks to run
+in user mode by default.
+- Supervisor and user mode is always available on SPARC.
+- Not much overhead in switching between user/supervisor because
+  most access to supervisor registers require taking a trap
+  anyways.  This is because SPARC special registers require
+  PSR.TE=0 for read-modify-write.
+
+Tasks can enter supervisor mode with the trap
+TT_ENTER_SUPERVISOR and leave with TT_LEAVE_SUPERVISOR. The only
+effect is that PSR.S is changed. You can use this if you need to
+access a supervisor asr or ASI, for example to configure the
+MMU.
+

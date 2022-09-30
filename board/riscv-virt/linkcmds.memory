@@ -1,0 +1,4 @@
+MEMORY {
+        RAM_INT : ORIGIN = 0x80400000, LENGTH = 64M
+}
+

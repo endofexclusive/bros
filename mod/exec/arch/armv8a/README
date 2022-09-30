@@ -1,0 +1,12 @@
+This port
+=========
+
+Executes in EL1 only. We enter EL1 in start.S.
+
+
+Background
+==========
+
+EL0 and EL1 are the only Exception levels that must be
+implemented. EL2 and EL3 are optional.
+

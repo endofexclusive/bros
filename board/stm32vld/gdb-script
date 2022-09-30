@@ -1,0 +1,13 @@
+# set architecture armv7
+file rui.elf
+set history save on
+set print pretty on
+set pagination off
+set confirm off
+tui enable
+
+# target extended-remote :1234
+target extended-remote :3333
+break exec_exc_reset
+break exec_exc_default
+

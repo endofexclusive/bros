@@ -1,0 +1,12 @@
+; Please try to keep this file in ASCII collating order.
+
+qstart=
+Driver Joined
+Select start code. ustart.c.o (default) links with standard C
+runtime.  nstart.c.o links with nano startup code (limited
+support for C standard library).
+
+qabs
+Driver
+
+; This comment is to ensure we retain the blank line above.

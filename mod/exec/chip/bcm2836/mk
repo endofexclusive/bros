@@ -1,0 +1,11 @@
+include arch/armv8a/mk
+
+SRCS += chip/bcm2836/enter_el1.S
+SRCS += chip/bcm2836/port.c
+SRCS += chip/bcm2836/intnum.c
+# SRCS += chip/bcm2836/rawio_mini.c
+SRCS += chip/bcm2836/rawio.c
+SRCS += chip/bcm2836/gpio.c
+
+INCDIR  += chip/bcm2836/include
+

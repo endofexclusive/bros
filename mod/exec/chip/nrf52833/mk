@@ -1,0 +1,10 @@
+include arch/armv6m/mk
+
+SRCS += chip/nrf51822/rawio.c
+SRCS += chip/nrf52833/chip.c
+
+INCDIR  += chip/nrf51822/include
+
+# nRF52833 has 48 external interrupts
+ASFLAGS += -Wa,--defsym,num_extint=48
+

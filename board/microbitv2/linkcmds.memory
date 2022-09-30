@@ -1,0 +1,7 @@
+/* Info : nRF52833-xxAA(build code: A0) 512kB Flash, 128kB RAM */
+
+MEMORY {
+        ROM_INT : ORIGIN = 0x00000000, LENGTH = 512K
+        RAM_INT : ORIGIN = 0x20000000, LENGTH = 128K
+}
+

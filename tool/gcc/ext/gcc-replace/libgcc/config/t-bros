@@ -1,0 +1,2 @@
+# Prevent building "advanced" stuff (for example, gcov support).
+INHIBIT_LIBC_CFLAGS = -Dinhibit_libc

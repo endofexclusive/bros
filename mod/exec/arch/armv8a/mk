@@ -1,0 +1,13 @@
+SRCS    += arch/armv8a/start.S
+SRCS    += arch/armv8a/intlock.S
+SRCS    += arch/armv8a/kcstart.c
+SRCS    += arch/armv8a/kprint_cpu.c
+SRCS    += arch/armv8a/trapcode.c
+SRCS    += mp.c
+SRCS    += intlock-mp.c
+SRCS    += intserver-mp.c
+
+INCDIR  += arch/armv8a/include
+
+# ASFLAGS  += -Wa,-mno-relax
+

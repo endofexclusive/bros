@@ -1,0 +1,14 @@
+MULTILIB_OPTIONS = march=rv32ima/march=rv32imaf/march=rv64ima/march=rv64imafd mabi=ilp32/mabi=ilp32f/mabi=lp64/mabi=lp64d 
+MULTILIB_DIRNAMES = rv32ima \
+rv32imaf \
+rv64ima \
+rv64imafd \
+ilp32 \
+ilp32f \
+lp64 \
+lp64d 
+MULTILIB_REQUIRED = march=rv32ima/mabi=ilp32 \
+march=rv32imaf/mabi=ilp32f \
+march=rv64ima/mabi=lp64 \
+march=rv64imafd/mabi=lp64d
+MULTILIB_REUSE = 

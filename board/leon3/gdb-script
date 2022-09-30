@@ -1,0 +1,15 @@
+# set architecture xyz
+file rui.elf
+set history save on
+set print pretty on
+set pagination off
+set confirm off
+tui enable
+# layout next
+
+break exec__start
+break exec_kassert_hit
+break exec_iAlert
+target extended-remote :3334
+# target extended-remote :1234
+

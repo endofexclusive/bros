@@ -1,0 +1,5 @@
+Builds for 32-bit RISC-V by default. To build for 64-bit, set
+the mk.cfg CPUFLAGS variable, for example to
+ -march=rv64ima   -mabi=lp64  -mcmodel=medany
+and run with run64.sh
+

@@ -1,0 +1,4 @@
+SRCS    += chip/none/start.c
+SRCS    += intlock-sp.c
+SRCS    += intserver-sp.c
+
